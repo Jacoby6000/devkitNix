@@ -32,6 +32,7 @@
           done
 
           mkdir -p $out
+          chmod -R +r opt
           cp -r opt $out/opt
           ln -sf $out/opt/devkitpro/tools/bin $out/bin
         '';
