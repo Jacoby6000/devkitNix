@@ -21,9 +21,9 @@
 
         nativeBuildInputs = with pkgs; [autoPatchelfHook];
 
-        phases = ["buildPhase" "fixupPhase"];
+        phases = ["installPhase" "fixupPhase"];
 
-        buildPhase = ''
+        installPhase = ''
           tar -xf $src
 
           for archive in $(find *.tar)
