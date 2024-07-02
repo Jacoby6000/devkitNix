@@ -130,7 +130,7 @@
             '';
             
             shellHook = devkitPPC.shellHook + ''
-              export LIBMOCHA=$out
+              export LIBMOCHA=${finalAttrs.finalPackage}
             '';
           };
         };
