@@ -113,7 +113,7 @@
           devkitARM = devkitARM;
           devkitPPC = devkitPPC;
 
-          libmocha = pkgs.stdenv.mkDerivation {
+          libmocha = pkgs.stdenv.mkDerivation (finalAttrs: {
             name = "libmocha";
             src = pkgs.fetchFromGitHub(pkgs.lib.importJSON ./sources/libmocha.json);
             preBuild = devkitPPC.shellHook;
@@ -129,10 +129,12 @@
               rm -rf $out/nix
             '';
             
-            shellHook = devkitPPC.shellHook + ''
-              export LIBMOCHA=${finalAttrs.finalPackage}
-            '';
-          };
+            passthru = rec {
+              shellHook = devkitPPC.shellHook + ''
+                export LIBMOCHA=${finalAttrs.finalPackage}
+              '';
+            };
+          });
         };
   in
     (flake-utils.lib.eachDefaultSystem (system: let
