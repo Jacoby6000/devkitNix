@@ -63,63 +63,88 @@
         };
       });
 
-    packages = pkgs: {
-      devkitA64 = mkDevkit pkgs {
-        name = "devkitA64";
-        src = ./sources/devkita64.json;
-        includePaths = [
-          "devkitA64"
-          "devkitA64/aarch64-none-elf"
-          "libnx"
-          "portlibs/switch"
-        ];
-      };
-      devkitARM = mkDevkit pkgs {
-        name = "devkitARM";
-        src = ./sources/devkitarm.json;
-        includePaths = [
-          "devkitARM"
-          "devkitARM/arm-none-eabi"
-          "libctru"
-          "libgba"
-          "libmirko"
-          "libnds"
-          "liborcus"
-          "libtonc"
-          "portlibs/3ds"
-          "portlibs/armv4t"
-          "portlibs/gba"
-          "portlibs/gp2x"
-          "portlibs/nds"
-        ];
-      };
-      devkitPPC = mkDevkit pkgs {
-        name = "devkitPPC";
-        src = ./sources/devkitppc.json;
-        includePaths = [
-          "devkitPPC"
-          "devkitPPC/powerpc-eabi"
-          "libogc"
-          "portlibs/gamecube"
-          "portlibs/ppc"
-          "portlibs/wii"
-          "portlibs/wiiu"
-          "wut"
-        ];
-      };
-    };
+    packages = pkgs:
+      let 
+          devkitA64 = mkDevkit pkgs {
+            name = "devkitA64";
+            src = ./sources/devkita64.json;
+            includePaths = [
+              "devkitA64"
+              "devkitA64/aarch64-none-elf"
+              "libnx"
+              "portlibs/switch"
+            ];
+          };
+          devkitARM = mkDevkit pkgs {
+            name = "devkitARM";
+            src = ./sources/devkitarm.json;
+            includePaths = [
+              "devkitARM"
+              "devkitARM/arm-none-eabi"
+              "libctru"
+              "libgba"
+              "libmirko"
+              "libnds"
+              "liborcus"
+              "libtonc"
+              "portlibs/3ds"
+              "portlibs/armv4t"
+              "portlibs/gba"
+              "portlibs/gp2x"
+              "portlibs/nds"
+            ];
+          };
+          devkitPPC = mkDevkit pkgs {
+            name = "devkitPPC";
+            src = ./sources/devkitppc.json;
+            includePaths = [
+              "devkitPPC"
+              "devkitPPC/powerpc-eabi"
+              "libogc"
+              "portlibs/gamecube"
+              "portlibs/ppc"
+              "portlibs/wii"
+              "portlibs/wiiu"
+              "wut"
+            ];
+          };
+        in {
+          devkitA64 = devkitA64;
+          devkitARM = devkitARM;
+          devkitPPC = devkitPPC;
+
+          libmocha = pkgs.stdenv.mkDerivation {
+            name = "libmocha";
+            src = pkgs.fetchFromGitHub(pkgs.lib.importJSON ./sources/libmocha.json);
+            preBuild = devkitPPC.shellHook;
+
+            installPhase = ''
+              DESTDIR=$out make install
+
+              # mocha's build wants to have the $DEVKITPRO path in there no matter what we do.
+              # DESTDIR=$out as specified above makes it so that the make file installs to $out/$DEVKITPRO
+              # so we need to move the files to the correct location.
+              mv $out/$DEVKITPRO/wut/usr/include $out/
+              mv $out/$DEVKITPRO/wut/usr/lib $out/
+              rm -rf $out/nix
+            '';
+            
+            shellHook = devkitPPC.shellHook + ''
+              export LIBMOCHA=$out
+            '';
+          };
+        };
   in
     (flake-utils.lib.eachDefaultSystem (system: let
       pkgs' = nixpkgs.legacyPackages.${system};
     in {
       packages = {
-        inherit (packages pkgs') devkitA64 devkitARM devkitPPC;
+        inherit (packages pkgs') devkitA64 devkitARM devkitPPC libmocha;
       };
-    }))
-    // {
+    })) // {
       overlays.default = final: prev: {
         devkitNix = {
-          inherit (packages prev) devkitA64 devkitARM devkitPPC;
+          inherit (packages prev) devkitA64 devkitARM devkitPPC libmocha;
         };
       };
     };
