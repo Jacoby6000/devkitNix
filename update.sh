@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p nix-prefetch-docker nix-prefetch-git
+#!nix-shell -i bash -p nix-prefetch-docker nix-prefetch-github
 # shellcheck shell=bash
 
 # if $1 is set, only fetch that dependency
@@ -11,7 +11,7 @@ function fetch_docker() {
     return
   fi
 
-  echo "Fetching devkitpro/$1"
+  echo "Fetching devkitpro/$1 from docker"
 
   cp "sources/$1.json" "sources/$1.json.old"
   nix-prefetch-docker --image-name "devkitpro/$1" --json --quiet > "sources/$1.json"
@@ -19,19 +19,19 @@ function fetch_docker() {
 }
 
 function fetch_github() {
-  if [[ -n $SELECTIVE_UPDATE && $SELECTIVE_UPDATE != $2 ]]; then
+  OWNER=$1
+  REPONAME=$2
+
+  if [[ -n $SELECTIVE_UPDATE && $SELECTIVE_UPDATE != $REPONAME ]]; then
     return
   fi
 
-  ORG=$1
-  REPO=$2
-  URL="https://github.com/$ORG/$REPO"
 
-  echo "Fetching $URL"
+  echo "Fetching $OWNER/$REPONAME from github"
 
-  cp "sources/$2.json" "sources/$2.json.old"
-  nix-prefetch-git --quiet $URL > "sources/$2.json"
-  diff -u "sources/$2.json" "sources/$2.json.old"
+  cp "sources/$REPONAME.json" "sources/$REPONAME.json.old"
+  nix-prefetch-github --quiet --json $OWNER $REPONAME > "sources/$REPONAME.json"
+  diff -u "sources/$REPONAME.json" "sources/$REPONAME.json.old"
 }
 
 mkdir -p sources

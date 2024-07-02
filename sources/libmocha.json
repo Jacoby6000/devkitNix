@@ -1,12 +1,6 @@
 {
-  "url": "https://github.com/wiiu-env/libmocha",
-  "rev": "630d9681bc0f29cc03a373cad94b76f17cfae763",
-  "date": "2024-06-03T14:36:43+02:00",
-  "path": "/nix/store/qxc147lqxf04khydjv56x5vm5nmzgviv-libmocha",
-  "sha256": "0xsg4flmx6qdnq29rz9npa8zcvpggaqjwdlwrz9bx6cdnznhxv1r",
-  "hash": "sha256-OewO7beNmb7Sz5w2LrF67272kbo2/ZwEtg2bXqkjT3c=",
-  "fetchLFS": false,
-  "fetchSubmodules": false,
-  "deepClone": false,
-  "leaveDotGit": false
+    "owner": "wiiu-env",
+    "repo": "libmocha",
+    "rev": "630d9681bc0f29cc03a373cad94b76f17cfae763",
+    "hash": "sha256-OewO7beNmb7Sz5w2LrF67272kbo2/ZwEtg2bXqkjT3c="
 }
