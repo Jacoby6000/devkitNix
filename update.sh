@@ -21,16 +21,23 @@ function fetch_docker() {
 function fetch_github() {
   OWNER=$1
   REPONAME=$2
+  REV=$3
 
   if [[ -n $SELECTIVE_UPDATE && $SELECTIVE_UPDATE != $REPONAME ]]; then
     return
   fi
 
+  # if rev is set add it to the command
+  if [[ -z $REV ]]; then
+    echo "Fetching $OWNER/$REPONAME from github"
+    nix-prefetch-github --quiet --json $OWNER $REPONAME > "sources/$REPONAME.json"
+  else 
+    echo "Fetching $OWNER/$REPONAME $REV from github"
+    nix-prefetch-github --quiet --json --rev $REV $OWNER $REPONAME > "sources/$REPONAME.json"
+  fi
 
-  echo "Fetching $OWNER/$REPONAME from github"
 
   cp "sources/$REPONAME.json" "sources/$REPONAME.json.old"
-  nix-prefetch-github --quiet --json $OWNER $REPONAME > "sources/$REPONAME.json"
   diff -u "sources/$REPONAME.json" "sources/$REPONAME.json.old"
 }
 
@@ -40,5 +47,6 @@ fetch_docker devkitarm
 fetch_docker devkita64
 fetch_docker devkitppc
 fetch_github wiiu-env libmocha
+fetch_github devkitpro wut v1.6.0    
 
 rm -f sources/*.json.old
