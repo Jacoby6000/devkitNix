@@ -132,7 +132,7 @@
             '';
             
             passthru = rec {
-              shellHook = devkitPPC.shellHook + ''
+              shellHook = ''
                 export LIBMOCHA=${finalAttrs.finalPackage}
               '';
             };
@@ -161,7 +161,7 @@
             '';
             
             passthru = rec {
-              shellHook = devkitPPC.shellHook + ''
+              shellHook = ''
                 export WUT_ROOT=${finalAttrs.finalPackage}
               '';
             };
