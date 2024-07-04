@@ -137,47 +137,18 @@
               '';
             };
           });
-          
-          wut = pkgs.stdenv.mkDerivation (finalAttrs: {
-            name = "wut";
-            src = pkgs.fetchFromGitHub(pkgs.lib.importJSON ./sources/wut.json);
-
-            preBuild = devkitPPC.shellHook + ''
-            # Some weird stripped down wut is included in devkitPPC and it conflicts with the sources when 
-            # we're rebuilding it from source
-            export CPATH=$${CPATH/':${devkitPPC}/opt/devkitpro/wut'/}
-            '';
-            buildInputs = [ devkitPPC ];
-
-            installPhase = ''
-              DESTDIR=$out make install
-
-              # wut's build wants to have the $DEVKITPRO path in there no matter what we do.
-              # DESTDIR=$out as specified above makes it so that the make file installs to $out/$DEVKITPRO
-              # so we need to move the files to the correct location.
-              mv $out/$DEVKITPRO/wut/include $out/
-              mv $out/$DEVKITPRO/wut/lib $out/
-              rm -rf $out/nix
-            '';
-            
-            passthru = rec {
-              shellHook = ''
-                export WUT_ROOT=${finalAttrs.finalPackage}
-              '';
-            };
-          });
         };
   in
     (flake-utils.lib.eachDefaultSystem (system: let
       pkgs' = nixpkgs.legacyPackages.${system};
     in {
       packages = {
-        inherit (packages pkgs') devkitA64 devkitARM devkitPPC libmocha wut;
+        inherit (packages pkgs') devkitA64 devkitARM devkitPPC libmocha;
       };
     })) // {
       overlays.default = final: prev: {
         devkitNix = {
-          inherit (packages prev) devkitA64 devkitARM devkitPPC libmocha wut;
+          inherit (packages prev) devkitA64 devkitARM devkitPPC libmocha;
         };
       };
     };

@@ -47,6 +47,5 @@ fetch_docker devkitarm
 fetch_docker devkita64
 fetch_docker devkitppc
 fetch_github wiiu-env libmocha
-fetch_github devkitpro wut v1.6.0    
 
 rm -f sources/*.json.old
